@@ -20,7 +20,7 @@ const initialState = {
 			status: 'pendente de autorização',
 			createdIn: '18/06/2019',
 			authorization: '31/08/1995',
-			dueDate: '12/07/1996',
+			dueDate: '12/07/2020',
 		},
 		{
 			id: 2,
@@ -33,7 +33,7 @@ const initialState = {
 			cep: '',
 			createdIn: '18/06/2019',
 			authorization: '16/10/1965',
-			dueDate: '11/05/1966',
+			dueDate: '1/06/2020',
 			status: 'pendente de pagamento',
 		},
 		{

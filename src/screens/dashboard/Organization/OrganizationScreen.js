@@ -21,7 +21,7 @@ import freeIcon from '../../../assets/free.svg';
 import extendDeadlineIcon from '../../../assets/extendDeadline.svg';
 import deleteIcon from '../../../assets/delete.svg';
 import selectMaisMobile from '../../../assets/selectMais.svg';
-import Exit from '../../../assets/exit.svg';
+import Exit from '../../../assets/fechar.svg';
 
 // Redux
 import { updateTableDatas, deleteOrg } from '../../../dataflow/modules/organization-modules';
@@ -52,14 +52,6 @@ const ContainerUser = styled.div`
 
 	@media(max-width: 648px) {
 		background-color: ${props => (props.background ? '#FFFFFF' : '#FFFFFF')};
-	}
-`;
-
-const InvolveButton = styled.div`
-	padding: .5rem 0.2rem;
-
-	@media (max-width: 768px) {
-		padding: 0;
 	}
 `;
 
@@ -124,7 +116,7 @@ const TitleMyOrganization = styled.h2`
 `;
 
 const SelectViewBy = styled.div`
-	width: ${props => (props.isAdmin ? '35%' : '35%')};
+	width: ${props => (props.isAdmin ? '37%' : '36%')};
 	display: flex;
 	flex-direction: row;
 	justify-content: ${props => (props.isAdmin ? 'flex-end' : 'initial')};
@@ -309,7 +301,7 @@ const SelectedItem = styled.p`
 
 const ContainerTableUser = styled.div`
 	width: ${props => (props.width && '100%')};
-	max-height: 100vh;
+	/* max-height: 100vh; */
 	background-color: ${props => (props.background ? '#FFFFFF' : '#FFFFFF')};
 	border-radius: ${props => (props.border ? '0' : '3px 3px 0 0')};
 	margin: ${props => (props.margin ? '0' : ' 0 2.5rem')};
@@ -327,8 +319,8 @@ const Content = styled.div`
 	width: 100%;
 	max-width: 100%;
 	/* height: calc(100vh - 85px - 5.8rem - 1.87rem); */
-	height: calc(100vh - 79px - 5.8rem - 2.4rem);
-	padding: ${props => (props.padding ? '3rem 5.5rem 0' : '1.5rem 2rem 0')};
+	height: calc(100vh - 66px - 5.8rem - 2.4rem);
+	padding: ${props => (props.padding ? '3rem 5rem 0' : '1.5rem 2rem 0')};
 
 	@media (max-width: 768px) {
 		padding: 1.5rem 0 0;
@@ -589,7 +581,9 @@ const ContainerModalDelete = styled.div`
 const ModalDelete = styled.div`
 	width: 480px;
 	background: #FFF;
-	padding: 1% 1% 1% 3%;
+	border-radius: 3px;
+	padding: 1% 2% 1% 2%;
+	position: relative;
 
 	@media (max-width: 490px) {
 		width: 100%;
@@ -601,15 +595,19 @@ const ModalDelete = styled.div`
 	}
 `;
 
+const ContainerImage = styled.div`
+	width: 100%;
+	display: flex;
+	justify-content: flex-end;
+`;
+
+const ImageExit = styled.img`
+	cursor: pointer;
+`;
+
 const TitleModal = styled.div`
 	display: flex;
 	justify-content: space-between;
-
-	img {
-		width: 20px;
-		height: 20px;
-		cursor: pointer;
-	}
 `;
 
 const TitleDelete = styled.h2`
@@ -628,19 +626,20 @@ const TitleDelete = styled.h2`
 `;
 
 const WrapTextModal = styled.div`
-	width: 85%;
+	width: ${props => (props.width ? '85%' : '100%')};
 
 	@media (max-width: 490px) {
 		width: 100%;
 		height: 30%;
     display: flex;
     flex-direction: column;
+		justify-content: ${props => (props.justifyContent && 'center')};
 	}
 `;
 
 const TextModal = styled.p`
 	width: ${props => (props.width && '79%')};
-	margin: 1.5rem  0;
+	margin: ${props => (props.margin ? props.margin : '1.5rem 0')};
 	font-size: 1rem;
 	font-family: 'Overpass', Regular;
 	color: #404040;
@@ -672,7 +671,7 @@ const ButtonsModal = styled.div`
 `;
 
 const ButtonCancel = styled.button`
-	width: 50%;
+	width: ${props => (props.width ? '100%' : '50%')};
 	height: 3.5rem;
 	color: #F00;
 	border-radius: 4px;
@@ -699,6 +698,7 @@ class OrganizationScreen extends Component {
 			isSelected: undefined,
 			toFilter: false,
 			isDeleteModal: false,
+			isModalDateExpired: false,
 			modalType: '',
 			filter: '',
 			selectedValue: 'Selecionar status',
@@ -818,8 +818,29 @@ class OrganizationScreen extends Component {
 		});
 	}
 
+	handleModalDateExpired = () => {
+		this.setState({
+			isModalDateExpired: !this.state.isModalDateExpired,
+			isDeleteModal: false,
+		});
+	}
+
 	deleteOrganization = () => {
-		this.props.deleteOrg(this.state.itemSelected);
+		const { itemSelected } = this.state;
+
+		const dueDate = new Date(itemSelected.dueDate);
+		const currentDate = new Date();
+		// const currentDate = () => {
+		// 	const date = new Date();
+		// 	return `${date.getDay()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+		// };
+
+		if (currentDate <= dueDate) {
+			this.handleModalDateExpired();
+			return null;
+		}
+
+		this.props.deleteOrg(itemSelected);
 		this.setState({
 			isModal: false,
 		});
@@ -896,7 +917,7 @@ class OrganizationScreen extends Component {
 								{this.state.selectedItems.map((item, index) => (
 									<SelectedItem
 										onClick={() => this.handleSelectedValue(item)}
-										style={{ paddingTop: item === 'Selecionar status' && '.7rem'}}
+										style={{ paddingTop: item === 'Selecionar status' && '.7rem' }}
 										key={index}
 										hover={item}
 									>
@@ -958,28 +979,35 @@ class OrganizationScreen extends Component {
 		return (
 			<>
 				{this.props.isAdmin ? (
-					<Box isClickedStatus={item.status === 'isento' || item.status === 'autorizado'
-						|| item.status === 'prazo prorrogado' ? null : item.id === this.state.isClickedStatus}>
-						{!hiddenList && listinha.map((status, index) => (
-							<ImageStatus
-								cursor={this.props.isAdmin}
-								key={index}
-								src={status.img}
-								alt={status.desc}
-								onClick={() => this.handleSelectedStatus(status, item)}
-							/>
-						))}
-					</Box>
-				) : null}
-				<BoxButton
-					isClickedName={item.status === 'isento' || item.status === 'autorizado'
-						|| item.status === 'prazo prorrogado' ? null : item.id === this.state.isClickedStatus}
-					onClick={() => this.handleClickedImageStatus(item)}
-				>
-					<TextStatus color={item.isChanged}>
-						{item.status}
-					</TextStatus>
-				</BoxButton>
+					<>
+						<Box isClickedStatus={item.status === 'isento' || item.status === 'autorizado'
+							|| item.status === 'prazo prorrogado' ? null : item.id === this.state.isClickedStatus}>
+							{!hiddenList && listinha.map((status, index) => (
+								<ImageStatus
+									cursor={this.props.isAdmin}
+									key={index}
+									src={status.img}
+									alt={status.desc}
+									onClick={() => this.handleSelectedStatus(status, item)}
+								/>
+							))}
+						</Box>
+						<BoxButton
+							isClickedName={item.status === 'isento' || item.status === 'autorizado'
+								|| item.status === 'prazo prorrogado' ? null : item.id === this.state.isClickedStatus}
+							onClick={() => this.handleClickedImageStatus(item)}
+						>
+							<TextStatus color={item.isChanged}>
+								{item.status}
+							</TextStatus>
+						</BoxButton>
+					</>
+				)
+					: (
+						<TextStatus color={item.isChanged}>
+							{item.status}
+						</TextStatus>
+					)}
 			</>
 		);
 	}
@@ -989,13 +1017,13 @@ class OrganizationScreen extends Component {
 			<ModalDelete onClick={e => e.stopPropagation()}>
 				<TitleModal>
 					<TitleDelete>Excluir Organização</TitleDelete>
-					<img onClick={this.handleDeleteModal} src={Exit} alt="Sair" />
+					{/* <ImageExit onClick={this.handleDeleteModal} src={Exit} alt="Sair" /> */}
 				</TitleModal>
 				<WrapTextModal>
 					<TextModal>
 						Após ser excluida, uma organização não pode ser recuperada.
 					</TextModal>
-					<TextModal width margin>
+					<TextModal width margin='1.5rem 0'>
 						Você deseja excluir <strong>{this.state.itemSelected.tradingName}</strong> permanentemente?
 					</TextModal>
 				</WrapTextModal>
@@ -1008,6 +1036,24 @@ class OrganizationScreen extends Component {
 						text="Confirmar"
 						fontSize="1.2rem"
 					/>
+				</ButtonsModal>
+			</ModalDelete>
+		</ContainerModalDelete>
+	)
+
+	renderModalDateExpired = () => (
+		<ContainerModalDelete onClick={this.handleModalDateExpired}>
+			<ModalDelete onClick={e => e.stopPropagation()}>
+				<ContainerImage>
+					<ImageExit onClick={this.handleModalDateExpired} src={Exit} alt="Sair" />
+				</ContainerImage>
+				<WrapTextModal justifyContent>
+					<TextModal margin='3rem 0 1.5rem'>
+						Essa organização não pode ser excluida, pois ainda não venceu o prazo de vencimento.
+					</TextModal>
+				</WrapTextModal>
+				<ButtonsModal>
+					<ButtonCancel width onClick={this.handleModalDateExpired}>Cancelar</ButtonCancel>
 				</ButtonsModal>
 			</ModalDelete>
 		</ContainerModalDelete>
@@ -1056,22 +1102,22 @@ class OrganizationScreen extends Component {
 						<TableTitleMob>E-mail</TableTitleMob>
 						<TableList>{user.email || '-'}</TableList>
 					</ContainerTableTitleMob>
-					<ContainerTableTitleMob>
-						<TableTitleMob>Telefone</TableTitleMob>
-						<TableList width={'7rem'} font={this.state.hovered === item}>{user.telephone || '-'}</TableList>
-					</ContainerTableTitleMob>
-					<ContainerTableTitleMob>
-						<TableTitleMob>Criado em</TableTitleMob>
-						<TableList font={this.state.hovered === item}>{item.createdIn}</TableList>
-					</ContainerTableTitleMob>
-					<ContainerTableTitleMob>
-						<TableTitleMob>Autorização</TableTitleMob>
-						<TableList font={this.state.hovered === item}>{item.authorization}</TableList>
-					</ContainerTableTitleMob>
-					<ContainerTableTitleMob>
-						<TableTitleMob>Vencimento</TableTitleMob>
-						<TableList font={this.state.hovered === item}>{item.dueDate}</TableList>
-					</ContainerTableTitleMob>
+						<ContainerTableTitleMob>
+							<TableTitleMob>Telefone</TableTitleMob>
+							<TableList width={'7rem'} font={this.state.hovered === item}>{user.telephone || '-'}</TableList>
+						</ContainerTableTitleMob>
+						<ContainerTableTitleMob>
+							<TableTitleMob>Criado em</TableTitleMob>
+							<TableList font={this.state.hovered === item}>{item.createdIn}</TableList>
+						</ContainerTableTitleMob>
+						<ContainerTableTitleMob>
+							<TableTitleMob>Autorização</TableTitleMob>
+							<TableList font={this.state.hovered === item}>{item.authorization}</TableList>
+						</ContainerTableTitleMob>
+						<ContainerTableTitleMob>
+							<TableTitleMob>Vencimento</TableTitleMob>
+							<TableList font={this.state.hovered === item}>{item.dueDate}</TableList>
+						</ContainerTableTitleMob>
 					</>
 					: <>
 						<TableList
@@ -1129,10 +1175,10 @@ class OrganizationScreen extends Component {
 								{this.renderStatus(item)}
 							</ContainerStatus>
 						) : (
-							<ContainerStatus>
-								{this.renderStatus(item)}
-							</ContainerStatus>
-						)}
+								<ContainerStatus>
+									{this.renderStatus(item)}
+								</ContainerStatus>
+							)}
 					</>
 				}
 				<ImageMore src={selectMaisMobile} onClick={() => this.isModalOpen(item)} />
@@ -1186,6 +1232,7 @@ class OrganizationScreen extends Component {
 			itemSelected,
 			modalType,
 			isModalCreateOrg,
+			isModalDateExpired,
 		} = this.state;
 
 		return (
@@ -1217,23 +1264,24 @@ class OrganizationScreen extends Component {
 					justifyContent={isAdmin}
 				>
 					{!isAdmin
-						&& <InvolveButton><Button
-							width='20%'
-							widthMedium='24%'
-							widthMobile='88%'
-							// widthMobileSmall='80%'
-							widthMobileSmall='90%'
-							height='4.3rem'
-							heightMobile='5.3rem'
-							fontSize='1.4rem'
-							margin='1rem 0 1rem 2.5rem'
-							marginMobile='1.5rem 2.5rem 1.5rem 4rem'
-							marginMobileSmall='1.5rem 1.5rem 1.5rem 1.2rem'
-							text='Criar Organização'
-							type='button'
-							orderMobile
-							organizationMobile
-							onClick={this.isModalCreateOrganization} /></InvolveButton>
+						&& <>
+							<Button
+								width='20%'
+								widthMedium='24%'
+								widthMobile='88%'
+								// widthMobileSmall='80%'
+								widthMobileSmall='90%'
+								height='4.3rem'
+								heightMobile='5.3rem'
+								fontSize='1.4rem'
+								margin='1.3rem 0 1.3rem 2.5rem'
+								marginMobile='1.5rem 2.5rem 1.5rem 4rem'
+								marginMobileSmall='1.5rem 1.5rem 1.5rem 1.2rem'
+								text='Criar Organização'
+								type='button'
+								orderMobile
+								organizationMobile
+								onClick={this.isModalCreateOrganization} /> </>
 					}
 					<ContainerTableUser
 						width={isAdmin}
@@ -1280,6 +1328,7 @@ class OrganizationScreen extends Component {
 					</ContainerTableUser>
 				</ContainerUser>
 				{isDeleteModal && this.renderModalDelete()}
+				{isModalDateExpired && this.renderModalDateExpired()}
 			</Container>
 		);
 	}

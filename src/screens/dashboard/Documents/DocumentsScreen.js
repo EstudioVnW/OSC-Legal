@@ -81,7 +81,7 @@ const MaximumWidth = styled.div`
 	max-width: 1440px;
 	height: ${props => (props.isAdmin ? '100%' : 'calc(100vh - 0px - 5.8rem - 1.5rem)')};
 	display: flex;
-	background: #FFF;	
+	background: #FFF;
 	overflow-y: hidden;
 
 	@media(max-width: 768px){
@@ -347,7 +347,7 @@ const ContainerSearch = styled.div`
 
 const SearchText = styled.p`
   color: #231F20;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-family: Overpass, Bold;
 	font-weight: 600;
   margin-right: 1rem;
