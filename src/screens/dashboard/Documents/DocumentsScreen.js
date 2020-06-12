@@ -1514,17 +1514,18 @@ class DocumentsScreen extends Component {
 		e.preventDefault();
 
 		const fileDoc = e.target.files[0];
+		const { hoverUpload } = this.state;
 
 		const newDocData = {
 			fileDoc,
-			doc,
+			hoverUpload,
 		};
 
 		this.setState({
 			newDocData,
 		});
 
-		this.uploadDocumento(fileDoc, doc);
+		this.uploadDocumento(fileDoc, hoverUpload);
 	}
 
 	handleSelected = (doc) => {
