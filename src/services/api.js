@@ -55,7 +55,7 @@ export const createNewPassword = base64credentials =>
 // Onboarding
 
 // Organization
-export const createOrganization = (org) =>
+export const createOrganization = org =>
 	axios({
 		url: `${API_URL}/organizations`,
 		method: "post",
@@ -65,7 +65,7 @@ export const createOrganization = (org) =>
 		data: org,
 	});
 
-export const removeOrg = (orgId) =>
+export const removeOrg = orgId =>
 	axios({
 		url: `${API_URL}/organizations/${orgId}`,
 		method: "delete",
@@ -74,7 +74,7 @@ export const removeOrg = (orgId) =>
 		},
 	});
 
-export const getAllOrganizations = (userId) =>
+export const getAllOrganizations = userId =>
 	axios({
 		url: `${API_URL}/users/${userId}/organizations`,
 		method: "get",
@@ -175,12 +175,4 @@ export const deleteTemplate = templateId => axios({
 		Authorization: `Bearer ${token}`,
 	},
 });
-
-// export const downloadTemplate = templateId => axios({
-// 	url: `${API_URL}/templates/${templateId}/download`,
-// 	method: 'get',
-// 	headers: {
-// 		Authorization: `Bearer ${token}`,
-// 	},
-// });
 // Template (Document - Admin)
